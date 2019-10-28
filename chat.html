@@ -10,19 +10,26 @@
     <title>My Chat</title>
 </head>
 <body>
+    <div class="container text-center p-5">
 
-    <!-- CONTENTE -->
-    <form id="login" class="container text-center form-inline">
-        <input type="text" name="caller" id="caller" placeholder="Your name" class="form-control" />
-        <input type="hidden" name="receiver" id="receiver" value="Computer" />
-        <button v-on:click="login" type="button" class="btn btn-primary">Start chat!</button>
-    </form>
+        <!-- CONTENTE -->
 
-    <div id="app" class="">
-        <p class="h5">{{caller}}</p>
-        <ul v-for="message in messages">
-            <li>{{message}}</li>
-        </ul>
+        <form v-bind:class="{'d-none':hide}" id="login" class="">
+            <input type="text" name="caller" id="caller" placeholder="Your name" class="form-control" />
+            <input type="hidden" name="receiver" id="receiver" value="Computer" />
+            <button v-on:click="login" type="button" class="btn btn-primary">Start chat!</button>
+        </form>
+    
+        <div v-bind:class="{'d-none':hide}" id="app" class="p-5">
+            <p class="h5">{{caller}}</p>
+            <ul v-for="message in messages">
+                <li>{{message}}</li>
+            </ul>
+            <div class="btn-group" id="messager">
+                <input type="text" name="message" id="message" class="form-control">
+                <button v-on:click="sendMsg" type="button" class="btn btn-primary input-group-prepend">Send</button>
+            </div>
+        </div>
     </div>
 
     <!-- SCRIPTS -->

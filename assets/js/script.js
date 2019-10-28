@@ -4,16 +4,24 @@ const app = new Vue({
         chat:'',
         messages:[],
         caller:'',
-        receiver:''
+        receiver:'',
+        hide:true
     },
     methods:{
-        login: function(){
+        sendMsg: function(){
+            this.messages.push($("#message").val())
             $.ajax({
                 type:'post',
-                url: `/${chat}`,
-                data: $("#login").serializeArray(),
-                success: (data)=>console.log(data)
+                url: `/update/${this.chat}`,
+                data: {messages:JSON.stringify(this.messages)}
             })
+
+            $.ajax({
+                type:'get',
+                url: `/get/${this.chat}`,
+                success: (data)=>this.messages = JSON.parse(data.messages)
+            })
+            $("#message").val('')
         }
     }
 })
@@ -21,18 +29,22 @@ const app = new Vue({
 const login = new Vue({
     el:'#login',
     data:{
+        hide:false
     },
     methods:{
         login: function(){
             $.ajax({
                 type:'post',
-                url: '/',
+                url: '/save',
                 data: $("#login").serializeArray(),
                 success: (data)=>{
-                    app.chat=data.id
-                    app.caller = data.caller
-                    app.receiver = data.receiver
-                    app.messages.push(`Hello ${data.caller}!`)
+                    app.chat = data
+                    app.caller = $("#caller").val()
+                    app.receiver = $("#receiver").val()
+                    app.messages.push(`Hello ${app.caller}!`)
+                    this.hide = true
+                    app.hide = false
+                    $("#caller").val('')
                 }
             })
         }

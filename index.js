@@ -19,7 +19,7 @@ const db = mongoose.connection
 const schema = new mongoose.Schema({
     caller:String,
     receiver:String,
-    message:Array
+    messages:String
 })
 
 schema.methods.confirm = ()=>console.log('Operação realizada com sucesso!')
@@ -31,19 +31,35 @@ app.get('/',(req,res)=>fs.readFile('chat.html','utf8', (err,data)=>{
     else res.send(data)
 }))
 
-app.post('/',(req,res)=>{
+app.post('/save',(req,res)=>{
     let data = new Kitten({
         caller:req.body.caller,
         receiver:req.body.receiver,
-        message:req.body.message
+        messages:req.body.messages
     })
-    data.save((err,data)=>{
+    data.save((err,response)=>{
         if(err) throw err
         else{
             data.confirm()
-            res.send(data)
+            res.send(response.id)
         }
     })
+})
+
+app.get('/get/:id',(req,res)=>{
+    Kitten.findById({_id:req.params.id},data=>res.send(data))
+})
+
+app.post('/update/:id',(req,res)=>{
+    Kitten.findByIdAndUpdate(
+        {_id:req.params.id},
+        {messages:req.body.messages},
+        {upsert:true, useFindAndModify:false},
+        err=>{
+            if(err) throw err
+            else console.log(req.body.messages)
+        }
+    )
 })
 
 db.on('error',console.error.bind(console,'connection error:'))
