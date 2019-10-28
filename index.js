@@ -41,7 +41,7 @@ app.post('/',(req,res)=>{
         if(err) throw err
         else{
             data.confirm()
-            res.send(data.id)
+            res.send(data)
         }
     })
 })

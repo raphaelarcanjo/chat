@@ -1,34 +1,40 @@
-let chat = ''
-
-const login = new Vue({
-    el:'#login',
+const app = new Vue({
+    el:'#app',
     data:{
+        chat:'',
+        messages:[],
         caller:'',
         receiver:''
     },
     methods:{
         login: function(){
-            fetch('/',{
-                method:'POST',
-                body:new FormData(document.querySelector("#login"))
+            $.ajax({
+                type:'post',
+                url: `/${chat}`,
+                data: $("#login").serializeArray(),
+                success: (data)=>console.log(data)
             })
-            .then(response=>response.text())
-            .then(data=>chat=data)
         }
     }
 })
 
-const app = new Vue({
-    el:'#app',
+const login = new Vue({
+    el:'#login',
     data:{
-        chat:chat,
-        message:'false'
     },
     methods:{
-        sendMsg: function(){
-            fetch('/'+chat,{method:'post'})
-            .then(response=>response.json())
-            .then(data=>this.message = data)
+        login: function(){
+            $.ajax({
+                type:'post',
+                url: '/',
+                data: $("#login").serializeArray(),
+                success: (data)=>{
+                    app.chat=data.id
+                    app.caller = data.caller
+                    app.receiver = data.receiver
+                    app.messages.push(`Hello ${data.caller}!`)
+                }
+            })
         }
     }
 })

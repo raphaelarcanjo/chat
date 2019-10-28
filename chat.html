@@ -19,8 +19,9 @@
     </form>
 
     <div id="app" class="">
-        <ul>
-            <li></li>
+        <p class="h5">{{caller}}</p>
+        <ul v-for="message in messages">
+            <li>{{message}}</li>
         </ul>
     </div>
 
