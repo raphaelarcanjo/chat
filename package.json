@@ -1,0 +1,25 @@
+{
+  "name": "chat",
+  "version": "1.0.0",
+  "description": "Simple chat application in NodeJS, MongoDB and VueJS",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongodb": "^3.3.3",
+    "mongoose": "^5.7.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raphaelarcanjo/chat.git"
+  },
+  "author": "Raphael Oliveira Cunha",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/raphaelarcanjo/chat/issues"
+  },
+  "homepage": "https://github.com/raphaelarcanjo/chat#readme"
+}
