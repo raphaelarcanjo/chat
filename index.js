@@ -1,9 +1,16 @@
 const express = require('express')
 const app = express()
 const fs = require('fs')
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.json())
+
 const mongoose = require('mongoose')
 const databaseUrl = 'mongodb://localhost:27017/'
 const database = 'chat'
+
+app.use(express.static("assets"))
 
 mongoose.connect(databaseUrl + database, {useNewUrlParser: true, useUnifiedTopology:true})
 
@@ -23,6 +30,21 @@ app.get('/',(req,res)=>fs.readFile('chat.html','utf8', (err,data)=>{
     if(err) throw err
     else res.send(data)
 }))
+
+app.post('/',(req,res)=>{
+    let data = new Kitten({
+        caller:req.body.caller,
+        receiver:req.body.receiver,
+        message:req.body.message
+    })
+    data.save((err,data)=>{
+        if(err) throw err
+        else{
+            data.confirm()
+            res.send(data.id)
+        }
+    })
+})
 
 db.on('error',console.error.bind(console,'connection error:'))
 db.once('open', ()=>app.listen(3000,()=>console.log('Servidor rodando na porta 3000')))
