@@ -50,6 +50,10 @@ app.get('/get/:id',(req,res)=>{
     Kitten.findById({_id:req.params.id},data=>res.send(data))
 })
 
+app.get('/calls',(req,res)=>{
+    Kitten.find({},(err,data)=>res.send(data))
+})
+
 app.post('/update/:id',(req,res)=>{
     Kitten.findByIdAndUpdate(
         {_id:req.params.id},
