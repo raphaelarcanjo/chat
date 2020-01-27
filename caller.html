@@ -17,7 +17,6 @@
     <!-- CONTENTE -->
 
     <form v-bind:class="{'d-none':hide}" id="login" class="">
-      <input type="hidden" name="receiver" id="receiver" value="Computer" />
       <div class="input-group">
         <input type="text" name="caller" id="caller" placeholder="Your name" class="form-control" />
         <div class="input-group-append">
@@ -35,14 +34,6 @@
         <input type="text" name="message" id="message" class="form-control">
         <button v-on:click="sendMsg" type="button" class="btn btn-primary input-group-prepend">Send</button>
       </div>
-    </div>
-
-    <div id="calls" class="p-5">
-      <ul>
-        <li v-for="call in calls">
-          <a href="#" class="btn btn-success m-2">{{call.caller}}</a>
-        </li>
-      </ul>
     </div>
   </div>
 

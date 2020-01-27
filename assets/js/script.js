@@ -23,7 +23,6 @@ const app = new Vue({
     chat: '',
     messages: [],
     caller: '',
-    receiver: '',
     hide: true
   },
   methods: {
@@ -64,7 +63,6 @@ const login = new Vue({
         success: data => {
           app.chat = data
           app.caller = $("#caller").val()
-          app.receiver = $("#receiver").val()
           app.messages.push(`Hello ${app.caller}!`)
           this.hide = true
           app.hide = false

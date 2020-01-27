@@ -1,9 +1,25 @@
+// system variables
 const express = require('express')
+const session = require('express-session')
 const app = express()
 const fs = require('fs')
 const bodyParser = require('body-parser')
 
-app.use(bodyParser.urlencoded({extended:false}))
+// middlewares
+app.use(
+  session({
+    secret:'raphaelarcanjo',
+    saveUninitialized: true,
+    resave: true,
+    cookie:{
+      secure:true
+    }
+  })
+)
+
+app.use(bodyParser.urlencoded({
+  extended: false
+}))
 app.use(bodyParser.json())
 
 const mongoose = require('mongoose')
@@ -12,59 +28,123 @@ const database = 'chat'
 
 app.use(express.static("assets"))
 
-mongoose.connect(databaseUrl + database, {useNewUrlParser: true, useUnifiedTopology:true})
+// database connection
+mongoose.connect(databaseUrl + database, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
 
 const db = mongoose.connection
 
-const schema = new mongoose.Schema({
-    caller:String,
-    receiver:String,
-    messages:String
+// mongoose schemas
+const message_schema = new mongoose.Schema({
+  caller: String,
+  receiver: String,
+  messages: String
 })
 
-schema.methods.confirm = ()=>console.log('Operação realizada com sucesso!')
+const user_schema = new mongoose.Schema({
+  login: {type: String, required: true},
+  email: {type: String, required: true},
+  password: {type: String, required: true}
+})
 
-const Kitten = mongoose.model('Kitten',schema)
+message_schema.methods.confirm = () => console.log('Collection messages ok.')
+user_schema.methods.confirm = () => console.log('Collection users ok.')
 
-app.get('/',(req,res)=>fs.readFile('chat.html','utf8', (err,data)=>{
-    if(err) throw err
-    else res.send(data)
-}))
+// models
+const Messages = mongoose.model('Messages', message_schema)
+const Users = mongoose.model('Users', user_schema)
 
-app.post('/save',(req,res)=>{
-    let data = new Kitten({
-        caller:req.body.caller,
-        receiver:req.body.receiver,
-        messages:req.body.messages
+// routes
+
+// routes.static_pages
+app.get('/', (req, res) => fs.readFile('caller.html', 'utf8', (err, data) => res.send(data)))
+
+app.get('/receiver', (req, res) => {
+  let sess = req.session
+
+  if (typeof sess.email == 'undefined') fs.readFile('login.html', 'utf8', (err, data) => res.send(data))
+  else {
+    if (typeof sess.message == 'undefined') fs.readFile('receiver.html', 'uft8', (err, data) => res.send(data))
+    else res.writeHead(200,{Location: '/receiver'+sess.message})
+  }
+})
+
+app.get('/login', (req, res) => fs.readFile('login.html', 'utf8', (err, data) => res.send(data)))
+
+// routes.ajaxes
+app.post('/save', (req, res) => {
+  let data = new Messages({
+    caller: req.body.caller,
+    messages: req.body.messages
+  })
+  data.save((err, response) => {
+    if (err) throw err
+    else {
+      data.confirm()
+      res.send(response.id)
+    }
+  })
+})
+
+app.get('/get/:id', (req, res) => {
+  Messages.findById({
+    _id: req.params.id
+  }, data => res.send(data))
+})
+
+app.post('/update/:id', (req, res) => {
+  Messages.findByIdAndUpdate({
+      _id: req.params.id
+    }, {
+      messages: req.body.messages
+    }, {
+      upsert: true,
+      useFindAndModify: false
+    },
+    err => {
+      if (err) throw err
+      else console.log(req.body.messages)
+    }
+  )
+})
+
+app.get('/calls', (req, res) => {
+  Messages.find({}, (err, data) => res.send(data))
+})
+
+app.get('/receiver/:id', (req, res) => {
+  let sess = req.session
+
+  Messages.findById({
+    _id: req.params.id
+  }, (err, data) => {
+    if (data != "") {
+      sess.message = data.messages
+      res.send(data)
+    }
+  })
+})
+
+app.post('/login',(req,res) => {
+  let sess = req.session;
+
+  if (sess.email != '') fs.readFile('receiver.html', 'utf8', (err, data) => res.send(data))
+  else {
+    let login = req.body.login.toLowerCase()
+    let password = req.body.password
+    Users.findOne({'login':login},(err, data) => {
+      if (err) throw err
+      else if (data.login == login && data.password == password) {
+        sess.email = data.email
+        res.writeHead(200,{Location:'receiver.html'})
+      }
+      else fs.readFile('login.html', 'utf8', (err,data) => res.send(data))
     })
-    data.save((err,response)=>{
-        if(err) throw err
-        else{
-            data.confirm()
-            res.send(response.id)
-        }
-    })
+  }
 })
 
-app.get('/get/:id',(req,res)=>{
-    Kitten.findById({_id:req.params.id},data=>res.send(data))
-})
-
-app.get('/calls',(req,res)=>{
-    Kitten.find({},(err,data)=>res.send(data))
-})
-
-app.post('/update/:id',(req,res)=>{
-    Kitten.findByIdAndUpdate(
-        {_id:req.params.id},
-        {messages:req.body.messages},
-        {upsert:true, useFindAndModify:false},
-        err=>{
-            if(err) throw err
-            else console.log(req.body.messages)
-        }
-    )
-})
-
-db.on('error',console.error.bind(console,'connection error:'))
-db.once('open', ()=>app.listen(3000,()=>console.log('Servidor rodando na porta 3000')))
+// server up
+db.on('error', console.error.bind(console, 'connection error:'))
+db.once('open', () => app.listen(3000, () => console.log('Servidor rodando na porta 3000')))
