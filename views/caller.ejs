@@ -1,0 +1,23 @@
+<%- contentFor('title') %>
+Caller
+
+<%- contentFor('content') %>
+<form v-bind:class="{'d-none':hide}" id="login" class="">
+  <div class="input-group">
+    <input type="text" name="caller" id="caller" placeholder="Your name" class="form-control" />
+    <div class="input-group-append">
+      <button v-on:click="login" type="button" class="btn btn-primary">Start chat!</button>
+    </div>
+  </div>
+</form>
+
+<div v-bind:class="{'d-none':hide}" id="app" class="p-5">
+  <p class="h5">{{caller}}</p>
+  <ul v-for="message in messages">
+    <li>{{message}}</li>
+  </ul>
+  <div class="btn-group" id="messager">
+    <input type="text" name="message" id="message" class="form-control">
+    <button v-on:click="sendMsg" type="button" class="btn btn-primary input-group-prepend">Send</button>
+  </div>
+</div>

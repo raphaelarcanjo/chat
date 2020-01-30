@@ -3,9 +3,18 @@ const express = require('express')
 const session = require('express-session')
 const app = express()
 const fs = require('fs')
+const faker = require('faker')
+const expressLayouts = require('express-ejs-layouts')
 const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
+const databaseUrl = 'mongodb://localhost:27017/'
+const database = 'chat'
 
 // middlewares
+app.set('view engine', 'ejs')
+
+app.use(expressLayouts)
+
 app.use(
   session({
     secret:'raphaelarcanjo',
@@ -20,21 +29,18 @@ app.use(
 app.use(bodyParser.urlencoded({
   extended: false
 }))
-app.use(bodyParser.json())
 
-const mongoose = require('mongoose')
-const databaseUrl = 'mongodb://localhost:27017/'
-const database = 'chat'
+app.use(bodyParser.json())
 
 app.use(express.static("assets"))
 
 // database connection
+const db = mongoose.connection
+
 mongoose.connect(databaseUrl + database, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-
-const db = mongoose.connection
 
 // mongoose schemas
 const message_schema = new mongoose.Schema({
@@ -59,19 +65,19 @@ const Users = mongoose.model('Users', user_schema)
 // routes
 
 // routes.static_pages
-app.get('/', (req, res) => fs.readFile('caller.html', 'utf8', (err, data) => res.send(data)))
+app.get('/', (req, res) => res.render('/views/caller'))
 
 app.get('/receiver', (req, res) => {
   let sess = req.session
 
-  if (typeof sess.email == 'undefined') fs.readFile('login.html', 'utf8', (err, data) => res.send(data))
+  if (typeof sess.email == 'undefined') res.render('/views/login')
   else {
-    if (typeof sess.message == 'undefined') fs.readFile('receiver.html', 'uft8', (err, data) => res.send(data))
+    if (typeof sess.message == 'undefined') res.render('/views/receiver')
     else res.writeHead(200,{Location: '/receiver'+sess.message})
   }
 })
 
-app.get('/login', (req, res) => fs.readFile('login.html', 'utf8', (err, data) => res.send(data)))
+app.get('/login', (req, res) => res.render('/views/login'))
 
 // routes.ajaxes
 app.post('/save', (req, res) => {
@@ -130,7 +136,7 @@ app.get('/receiver/:id', (req, res) => {
 app.post('/login',(req,res) => {
   let sess = req.session;
 
-  if (sess.email != '') fs.readFile('receiver.html', 'utf8', (err, data) => res.send(data))
+  if (sess.email != '') res.render('/views/receiver')
   else {
     let login = req.body.login.toLowerCase()
     let password = req.body.password
@@ -138,9 +144,9 @@ app.post('/login',(req,res) => {
       if (err) throw err
       else if (data.login == login && data.password == password) {
         sess.email = data.email
-        res.writeHead(200,{Location:'receiver.html'})
+        res.render('/views/receiver')
       }
-      else fs.readFile('login.html', 'utf8', (err,data) => res.send(data))
+      else res.render('/views/login')
     })
   }
 })
