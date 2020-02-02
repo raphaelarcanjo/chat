@@ -1,31 +1,18 @@
-const calls = new Vue({
-  el: '#calls',
-  data: {
-    calls: [],
-  },
-  methods: {
-    getCalls: function() {
-      $.ajax({
-        type: 'get',
-        url: '/calls',
-        success: data => this.calls = data
-      })
-    }
-  },
-  created: function() {
-    new Promise(this.getCalls)
-  }
-})
-
 const app = new Vue({
   el: '#app',
   data: {
+    calls: [],
     chat: '',
     messages: [],
     caller: '',
     hide: true
   },
   methods: {
+    getCalls: function() {
+      fetch('/calls')
+      .then(data => data.json())
+      .then(response => response.forEach((element, index) => this.calls.push(element)))
+    },
     sendMsg: function() {
       this.messages.push($("#message").val())
       $.ajax({
@@ -44,7 +31,47 @@ const app = new Vue({
 
       $("#message").val('')
 
-      new Promise(calls.getCalls)
+      this.getCalls
+    }
+  },
+  created: function() {
+    new Promise(this.getCalls)
+  }
+})
+
+const calls = new Vue({
+  el: '#calls',
+  data: {
+    calls: app.calls,
+    id: '',
+    hide: true
+  },
+  methods: {
+    openMsg: function(event) {
+      
+      this.id = event.target.id
+
+      fetch(`/receiver/${this.id}`)
+      .then(data => data.json())
+      .then(response => {
+        app.messages = response.messages
+        app.caller = response.caller
+        this.hide = app.hide = false
+      })
+    },
+    endMsg: function() {
+      fetch('/endmsg',{
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        method: 'post',
+        body: JSON.stringify({id:this.id})
+      })
+      .then(data => data.text())
+      .then(response => {
+        if (response._id == this.id) window.location.href = '/receiver'
+      })
     }
   }
 })

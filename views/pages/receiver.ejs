@@ -1,0 +1,37 @@
+<%- contentFor('head') %>
+
+<%- contentFor('page_title') %>
+Receiver
+
+<%- contentFor('header') %>
+
+<%- contentFor('content') %>
+
+<div id="app" v-bind:class="{'d-none':hide}">
+  <p class="h5">{{caller}}</p>
+  <ul v-for="message in messages">
+    <li>{{message}}</li>
+  </ul>
+  <div class="btn-group" id="messager">
+    <input type="text" name="message" id="message" class="form-control">
+    <button v-on:click="sendMsg" type="button" class="btn btn-primary input-group-prepend">Send</button>
+  </div>
+</div>
+
+<div id="calls" class="p-5">
+
+  <ul v-bind:class="{'d-none':!hide}">
+    <li v-for="(call, index) in calls">
+      <button v-bind:id="call._id" class="btn btn-success m-2" v-on:click="openMsg">{{call.caller}}</button>
+    </li>
+  </ul>
+
+  <ul v-bind:class="{'d-none':hide}">
+    <li v-for="(call, index) in calls">
+      <button v-bind:id="call._id" v-bind:class="'btn btn-danger m-2'+{'d-none':hide}" v-on:click="endMsg">End call</button>
+    </li>
+  </ul>
+
+</div>
+
+<%- contentFor('footer') %>

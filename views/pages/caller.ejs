@@ -1,5 +1,9 @@
-<%- contentFor('title') %>
+<%- contentFor('head') %>
+
+<%- contentFor('page_title') %>
 Caller
+
+<%- contentFor('header') %>
 
 <%- contentFor('content') %>
 <form v-bind:class="{'d-none':hide}" id="login" class="">
@@ -21,3 +25,5 @@ Caller
     <button v-on:click="sendMsg" type="button" class="btn btn-primary input-group-prepend">Send</button>
   </div>
 </div>
+
+<%- contentFor('footer') %>

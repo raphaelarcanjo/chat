@@ -1,5 +1,9 @@
-<%- contentFor('title') %>
+<%- contentFor('head') %>
+
+<%- contentFor('page_title') %>
 Login
+
+<%- contentFor('header') %>
 
 <%- contentFor('content')%>
 <form action="/login" method="post">
@@ -13,3 +17,5 @@ Login
     <input type="submit" value="Entrar" class="btn btn-success" />
   </div>
 </form>
+
+<%- contentFor('footer') %>

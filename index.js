@@ -65,19 +65,19 @@ const Users = mongoose.model('Users', user_schema)
 // routes
 
 // routes.static_pages
-app.get('/', (req, res) => res.render('/views/caller'))
+app.get('/', (req, res) => res.render('pages/caller'))
 
 app.get('/receiver', (req, res) => {
   let sess = req.session
 
-  if (typeof sess.email == 'undefined') res.render('/views/login')
+  if (typeof sess.email == 'undefined') res.render('pages/login')
   else {
-    if (typeof sess.message == 'undefined') res.render('/views/receiver')
+    if (typeof sess.message == 'undefined') res.render('pages/receiver')
     else res.writeHead(200,{Location: '/receiver'+sess.message})
   }
 })
 
-app.get('/login', (req, res) => res.render('/views/login'))
+app.get('/login', (req, res) => res.render('pages/login'))
 
 // routes.ajaxes
 app.post('/save', (req, res) => {
@@ -127,7 +127,7 @@ app.get('/receiver/:id', (req, res) => {
     _id: req.params.id
   }, (err, data) => {
     if (data != "") {
-      sess.message = data.messages
+      sess.message = data._id
       res.send(data)
     }
   })
@@ -136,7 +136,7 @@ app.get('/receiver/:id', (req, res) => {
 app.post('/login',(req,res) => {
   let sess = req.session;
 
-  if (sess.email != '') res.render('/views/receiver')
+  if (sess.email != '') res.render('pages/receiver')
   else {
     let login = req.body.login.toLowerCase()
     let password = req.body.password
@@ -144,12 +144,14 @@ app.post('/login',(req,res) => {
       if (err) throw err
       else if (data.login == login && data.password == password) {
         sess.email = data.email
-        res.render('/views/receiver')
+        res.render('pages/receiver')
       }
-      else res.render('/views/login')
+      else res.render('pages/login')
     })
   }
 })
+
+app.post('/endmsg',(req,res) => Messages.findOneAndDelete({_id: req.body.id}, (err,data) => res.send(data)))
 
 // server up
 db.on('error', console.error.bind(console, 'connection error:'))
