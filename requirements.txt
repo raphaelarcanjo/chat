@@ -1,2 +1,14 @@
-Django
-python-dotenv
+asgiref==3.5.0
+click==8.0.4
+colorama==0.4.4
+Django==4.0.3
+Flask==2.0.3
+greenlet==1.1.2
+itsdangerous==2.1.1
+Jinja2==3.0.3
+MarkupSafe==2.1.1
+python-dotenv==0.19.2
+SQLAlchemy==1.4.32
+sqlparse==0.4.2
+tzdata==2022.1
+Werkzeug==2.0.3
